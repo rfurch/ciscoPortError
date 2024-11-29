@@ -18,8 +18,8 @@ username = "jtx.switchbackup"
 password = "1W4cR2zaVeva3YSHzTcz"
 
 # lab option for user
-username = "cisco"
-password = "cisco"
+#username = "cisco"
+#password = "cisco"
 
 ## Devices list: ALL devices list have the same structure:
 ## device = {'name' : id,'ip': ip}
@@ -89,8 +89,9 @@ async def getNodeInfo (_dbHandler, ip, getInfo):
   devicesLLDPData = await(util.execCommand(commandsShell, 'show lldp nei deta', ip))
   devicesLLDP = await util.parseLLDP(devicesLLDPData)     # parse LLDP info
 
-  print("CDP List:", devicesCDP)
-  print("LLDP List: ",  devicesLLDP)
+  if settings.verbose > 1:
+    print("CDP List:", devicesCDP)
+    print("LLDP List: ",  devicesLLDP)
 
   ## build one unique list of devices
   ## ALL devices list have the same structure:
@@ -102,8 +103,9 @@ async def getNodeInfo (_dbHandler, ip, getInfo):
     if d not in neighborsList:
       neighborsList.append(d)
 
-  
-  print(f"deviceID: {deviceID}")
+  if settings.verbose > 1:
+    print(f"deviceID: {deviceID}")
+
   if ( deviceID is None ):
     logging.info( "No device ID to update ARP / MAC Info (IP: {} name: {}) ".format(ip, hostname))
   else: 
@@ -142,8 +144,9 @@ async def getNodeInfo (_dbHandler, ip, getInfo):
         if (interfaceErrorsList is not None):
           await db.dbUpdateiFaceErrorList(_dbHandler, interfaceErrorsList, hostname)
 
-          print(interfaceErrorsList)  
-          print(len(interfaceErrorsList))  
+          if settings.verbose > 2:
+            print(interfaceErrorsList)  
+            print(len(interfaceErrorsList))  
 
   ## close comms. as the rest is just parsing
   commandsShell.close()
@@ -229,16 +232,13 @@ async def traverseNetNonrecursive(_dbHandler, ip, depth, getInfo):
         print ( "name: %40s IP: %s" % (n['name'], n['ip'])) 
       print ("-------------------------------------------")
 
-      break;   
-
-    
+      break;       
           
     i += 1  
 
   print("=============================================================================================")
   sys.stdout.flush()
   return (True)
-
   
 ## ------------------------------------------------------------------
 ## ------------------------------------------------------------------

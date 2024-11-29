@@ -5,7 +5,8 @@ import   pyodbc   # For python3 MSSQL
 
 import   settings   
 
-_DB_SERVER = 'BRJTXSNSRV01.bar.nucorsteel.local'
+#_DB_SERVER = 'BRJTXSNSRV01.bar.nucorsteel.local'
+_DB_SERVER = '10.14.2.227'
 _DB_DATABASE = 'networkInfo'
 _DB_USER = 'JewettTests'
 _DB_PASS = '#NstxErcot#'
@@ -20,8 +21,9 @@ _sql_conn=None
 async def dbConnect():
 
   try:
-    conn_string = 'DRIVER={SQL Server};' 'SERVER=' + _DB_SERVER + ';DATABASE=' + _DB_DATABASE + \
-                  ';UID=' + _DB_USER + ';PWD=' + _DB_PASS + ';Trusted_connection=no'
+    conn_string = 'DRIVER={ODBC Driver 18 for SQL Server};' 'SERVER=' + _DB_SERVER + ';DATABASE=' + _DB_DATABASE + \
+                    ';UID=' + _DB_USER + ';PWD=' + _DB_PASS + ';Encrypt=No'
+
     print (conn_string)  
     _sql_conn = pyodbc.connect(conn_string)
   except Exception as e:  
@@ -464,12 +466,14 @@ async def dbUpdateiFaceErrorList(dbConn, iFaceErrorList, hostname):
       
       sqlStr = '''INSERT INTO [networkInfo].[dbo].[interfaceErrors]
         ([deviceID], [interfaceName], [inputRate], [outputRate],
-         [inputErrors], [outputErrors], [crcErrors], [collisionErrors], [datetime]
-         VALUES({}, '{}', {}, {}, {}, {}, {}, {}, NOW() )
-         '''.format(d['id'], d['interfaceName'], d['inputRate'], d['outputRate'],
-             d['inputErrors'], d['outputErrors'], d['crcErrors'] , d['collisionErrors'])
+        [inputErrors], [outputErrors], [crcErrors], [collisionErrors],
+        [datetime])
+         VALUES({}, '{}', {}, {}, {}, {}, {}, {}, GETDATE() )
+         '''.format(d['id'], d['interfaceName'], d['inputRate'], 
+                    d['outputRate'], d['inputErrors'], d['outputErrors'], 
+                    d['crcErrors'] , d['collisionErrors'])
 
-      if settings.debug > 2:
+      if settings.debug > 2:  
         print(sqlStr)
 
       try:
@@ -479,7 +483,7 @@ async def dbUpdateiFaceErrorList(dbConn, iFaceErrorList, hostname):
           time.sleep(0.15)   
 
       except Exception as e:  
-        print("DB Operation failed...(hostname: {})".format(hostname))
+        print("DB Operation failed...err: {}  (hostname: {})".format(e, hostname))
         logging.info('DB ERROR : Merge error!! (hostname: {}'.format(hostname))
   	
   dbConn.commit() 

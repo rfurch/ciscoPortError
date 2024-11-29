@@ -47,8 +47,8 @@ async def excludedDevices(id, ip, platform):
 
   if ( 'UCS-' in platform.upper() 
     or 'AIR-' in platform.upper() 
-    or 'PHONE' in platform.upper() ): 
-    #or 'LINUX' in platform.upper() ):
+    or 'PHONE' in platform.upper()  
+    or 'LINUX' in platform.upper() ):
     #or 'PROD' in id.upper() ):   # exclude some devices in id.upper()
     return True
        
